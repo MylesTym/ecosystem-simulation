@@ -4,7 +4,10 @@ public class IdleState : PlayerState
 {
  public IdleState(PlayerController controller) : base(controller) {}
 
-    public override void Enter() { }
+    public override void Enter()
+    {
+        controller.Animation.SetSpeed(0f);
+    }
 
     public override void HandleInput()
     {

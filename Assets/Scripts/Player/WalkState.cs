@@ -18,6 +18,7 @@ public class WalkState : PlayerState
                        controller.transform.forward * controller.InputMove.y;
 
         controller.Move(move.normalized * controller.walkSpeed);
+        controller.Animation.SetSpeed(controller.InputMove.magnitude);
     }
 
     public override void Exit() { }

@@ -6,6 +6,8 @@ using UnityEngine.InputSystem.XR.Haptics;
 public class PlayerController : MonoBehaviour
 {
     private CharacterController characterController;
+    private PlayerAnimationController animationController;
+    private PlayerState currentState;
 
     [Header("Camera")]
     public Transform cameraHolder;
@@ -19,35 +21,32 @@ public class PlayerController : MonoBehaviour
 
     private float verticalSpeed;
     private float xRotation;
-    private PlayerState currentState;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public PlayerAnimationController Animation => animationController;
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
+        animationController = GetComponent<PlayerAnimationController>();
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
         SwitchState(new IdleState(this));
-
     }
 
-    // Update is called once per frame
     private void Update()
     {
         HandleInput();
         currentState.HandleInput();
         currentState.Update();
-
     }
-    
+
     private void HandleInput()
     {
         InputMove = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         InputLook = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-        // Camera Look
         float mouseX = InputLook.x;
         float mouseY = InputLook.y;
 
@@ -76,4 +75,3 @@ public class PlayerController : MonoBehaviour
         currentState.Enter();
     }
 }
-
