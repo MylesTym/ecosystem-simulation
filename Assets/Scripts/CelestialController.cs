@@ -16,30 +16,44 @@ public class CelestialController : MonoBehaviour
     public float CurrentTimeOfDay => timeOfDay;
     public bool IsDayTime => wasDaytime;
 
+    public Transform moonVisual;
+    public float moonDistance = 100f;
+
 
 
     // Update is called once per frame
     void Update()
     {
-        timeOfDay += (Time.deltaTime / (dayDurationInMinutes * 60f)) * 24f;
-        timeOfDay %= 24f;
+    timeOfDay += (Time.deltaTime / (dayDurationInMinutes * 60f)) * 24f;
+    timeOfDay %= 24f;
 
-        float sunAngle = (timeOfDay / 24f) * 360f - 90f;
-        sun.transform.rotation = Quaternion.Euler(sunAngle, 170f, 0f);
-        moon.transform.rotation = Quaternion.Euler(sunAngle + 180f, 170f, 0f);
+    // Rotate around X axis only (sunAngle = 0 at sunrise)
+    float sunAngle = (timeOfDay / 24f) * 360f - 90f;
 
-        bool isDayTime = timeOfDay >= 6f && timeOfDay <= 18f;
+    Quaternion sunRotation = Quaternion.Euler(sunAngle, 0f, 0f);
+    sun.transform.rotation = sunRotation;
 
-        if (isDayTime != wasDaytime)
-        {
-            wasDaytime = isDayTime;
-            OnDayStateChanged?.Invoke(isDayTime);
-        }
-        sun.enabled = isDayTime;
-        moon.enabled = !isDayTime;
+    // Moon is opposite the sun
+    Quaternion moonRotation = sunRotation * Quaternion.Euler(180f, 0f, 0f);
+    moon.transform.rotation = moonRotation;
 
-        OnTimeChanged?.Invoke(timeOfDay);
+    // Place moon visual opposite the sun
+    Vector3 moonDir = moon.transform.forward * -1f;
+    moonVisual.position = Vector3.zero + moonDir * moonDistance;
+    moonVisual.LookAt(Camera.main.transform);
 
+    // Day/night toggle
+    bool isDayTime = timeOfDay >= 6f && timeOfDay <= 18f;
 
+    if (isDayTime != wasDaytime)
+    {
+        wasDaytime = isDayTime;
+        OnDayStateChanged?.Invoke(isDayTime);
+    }
+
+    sun.enabled = isDayTime;
+    moon.enabled = !isDayTime;
+
+    OnTimeChanged?.Invoke(timeOfDay);
     }
 }
